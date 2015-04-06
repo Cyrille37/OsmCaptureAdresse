@@ -8,6 +8,7 @@ Utilise les librairies javascript :
 * leaflet
 * leaflet.iconlabel
 * leaflet.zoomdisplay
+* leaflet-hash https://github.com/mlevans/leaflet-hash
 
 Les champs du formulaire :
 * houseNumber : le numéro de la rue

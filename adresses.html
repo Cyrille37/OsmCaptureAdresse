@@ -38,7 +38,8 @@
 	<script src="lib/leaflet.js"></script>
 	<script src="lib/leaflet.iconlabel.js"></script>
 	<script src="lib/leaflet.zoomdisplay.js"></script>
-	<script src="lib/jquery-ui.min.js"></script>
+	<script src="lib/leaflet-hash.js"></script>
+ 	<script src="lib/jquery-ui.min.js"></script>
 
 	<script type="text/javascript">
 	"use strict";
@@ -53,15 +54,15 @@
 	var map = null ;
 	var markers = null ;
 
-var $dialog = $('<div></div>')
-               .html('<iframe id="formulaire" style="border: 0px; " src="' + 'formulaire.html' + '" width="100%" height="100%"></iframe>')
-               .dialog({
-                   autoOpen: false,
-                   modal: true,
-                   height: 625,
-                   width: 500,
-                   title: "Some title"
-               });
+	var $dialog = $('<div></div>')
+	   .html('<iframe id="formulaire" style="border: 0px; " src="' + 'formulaire.html' + '" width="100%" height="100%"></iframe>')
+	   .dialog({
+		   autoOpen: false,
+		   modal: true,
+		   height: 625,
+		   width: 500,
+		   title: "Some title"
+	});
 
 	$(function() {
 
@@ -79,6 +80,10 @@ var $dialog = $('<div></div>')
 		//osmFr.addTo(map);
 		map.addLayer(osmFr);
 
+		// Leaflet-hash lets you to add dynamic URL hashes to web pages with Leaflet maps.
+		// You can easily link users to specific map views.
+		var hash = new L.Hash(map);
+ 
 		L.control.scale().addTo(map);
 
 		markers = new L.featureGroup();
@@ -121,8 +126,33 @@ var $dialog = $('<div></div>')
 		}, [0,0]) 
 	}
 
+	/**
+	 * eg: #map=19/47.38314/0.69923
+	 */
+	function updateUrlHash()
+	{
+		var c = map.getCenter();
+		window.location.hash =
+			'#map='+map.getZoom()
+			+ '/' + c.lat + '/' + c.lng ;
+	}
+
+	window.onhashchange = function () {
+		console.log(window.location.hash.toString() );
+		//var r = new RegExp("/\#map=([\d]+)\/([\d\.]+)\/([\d\.]+)/");
+		var r = new RegExp("/map=([0-9]+)/");
+		var m = r.exec( window.location.hash );
+		console.log(m);
+		//		if( r && r.length==2 ){
+		//			$('#'+siren+'raisonSociale', item).val( r[1] );
+		//		}
+
+	}
+
 	function onMapMoveEnd()
 	{
+		updateUrlHash();
+
 		if( map.getZoom() < dataMinZoom )
 			return ;
 
