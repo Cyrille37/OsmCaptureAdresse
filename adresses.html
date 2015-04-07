@@ -64,8 +64,8 @@
 		   title: "Some title"
 	});
 
-	$(function() {
-
+	$(function()
+	{
 		map = L.map('map').setView(viewCenter, viewZoom );
 		map.on('moveend', onMapMoveEnd);
 
@@ -120,24 +120,15 @@
 		}
 	});
 
-	function getCentroid (arr) { 
+	function getCentroid (arr)
+	{ 
 		return arr.reduce(function (x,y) {
 			return [x[0] + y[0]/arr.length, x[1] + y[1]/arr.length] 
 		}, [0,0]) 
 	}
 
-	/**
-	 * eg: #map=19/47.38314/0.69923
-	 */
-	function updateUrlHash()
+	window.onhashchange = function ()
 	{
-		var c = map.getCenter();
-		window.location.hash =
-			'#map='+map.getZoom()
-			+ '/' + c.lat + '/' + c.lng ;
-	}
-
-	window.onhashchange = function () {
 		console.log(window.location.hash.toString() );
 		//var r = new RegExp("/\#map=([\d]+)\/([\d\.]+)\/([\d\.]+)/");
 		var r = new RegExp("/map=([0-9]+)/");
@@ -145,42 +136,48 @@
 		console.log(m);
 		//		if( r && r.length==2 ){
 		//			$('#'+siren+'raisonSociale', item).val( r[1] );
-		//		}
+		//	}
 
 	}
 
 	function onMapMoveEnd()
 	{
-		updateUrlHash();
 
 		if( map.getZoom() < dataMinZoom )
 			return ;
 
+		var bounds = map.getBounds();
+
+		//loadOApiAdress( bounds );
+
+	}// onMapMoveEnd
+
+	function loadOApiAdress( bounds )
+	{
 		$('#loader').show();
 
-		var b = map.getBounds();
-		var bboxQuery = ' <bbox-query'
-			+' e="'+b.getSouthEast().lng
-			+'" n="'+b.getNorthWest().lat
-			+'" s="'+b.getSouthEast().lat
-			+'" w="'+b.getNorthWest().lng+'"/>' ;
-
 		// http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide
+
+		var bboxQuery = ' <bbox-query'
+			+' e="'+bounds.getSouthEast().lng
+			+'" n="'+bounds.getNorthWest().lat
+			+'" s="'+bounds.getSouthEast().lat
+			+'" w="'+bounds.getNorthWest().lng+'"/>' ;
 
 		var xml =
 		 '<osm-script>'
 		+'<union>'
 		+' <query type="node">'
 		+'  <has-kv k="addr:housenumber" />'
-		+ bboxQuery
+		+   bboxQuery
 		+' </query>'
 		+' <query type="way">'
 		+'  <has-kv k="addr:housenumber" />'
-		+ bboxQuery
+		+   bboxQuery
 		+' </query>'
 		+' <query type="relation">'
 		+'  <has-kv k="type" v="associatedStreet" />'
-		+ bboxQuery
+		+   bboxQuery
 		+' </query>'
 		+'</union>'
 		+'<union>'
@@ -204,13 +201,17 @@
 			var xml = data ; //$.parseXML( data );
 
 			// Récupère toutes les relations de type "associatedStreet"
-			$('relation > tag[k="type"][v="associatedStreet"]', xml).each(function(){
+			$('relation > tag[k="type"][v="associatedStreet"]', xml).each(function()
+			{
 				var rel = $(this).parent();
 				var streetName = $('tag[k="name"]', rel).first().attr("v");
 
-				$('member[type="node"][role="house"]', $(this).parent() ).each(function(){
-					var ref = $(this).attr("ref");
+				// les membres "role=house" peuvent être des "nodes" ou des "ways"
 
+				// Les nodes
+				$('member[type="node"][role="house"]', $(this).parent() ).each(function()
+				{
+					var ref = $(this).attr("ref");
 					// retrouve le noeud
 					var nodeHousenumber = $('node[id="'+ref+'"] > tag[k="addr:housenumber"]', xml);
 					if( nodeHousenumber.length == 1 ){
@@ -232,7 +233,9 @@
 
 				});
 
-				$('member[type="way"][role="house"]', $(this).parent() ).each(function(){
+				// Les ways
+				$('member[type="way"][role="house"]', $(this).parent() ).each(function()
+				{
 					var ref = $(this).attr("ref");
 					// retrouve le way, s'il existe (zone carte visible)
 					var wayHousenumber = $('way[id="'+ref+'"] > tag[k="addr:housenumber"]', xml);
@@ -264,7 +267,7 @@
 
 			$('#loader').hide();
 
-		});
+		}); // ajax done
 
 	}
 
