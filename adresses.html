@@ -9,6 +9,7 @@
 		<link href="lib/leaflet.iconlabel.css" rel="stylesheet" media="screen"/>
 		<link href="lib/leaflet.zoomdisplay.css" rel="stylesheet" media="screen"/>
 		<link href="lib/jquery-ui.min.css" rel="stylesheet" media="screen"/>
+		<link href="lib/Control.Geocoder.css" rel="stylesheet" media="screen"/>
 
 		<style >
 			#map {
@@ -39,6 +40,7 @@
 	<script src="lib/leaflet.iconlabel.js"></script>
 	<script src="lib/leaflet.zoomdisplay.js"></script>
 	<script src="lib/leaflet-hash.js"></script>
+	<script src="lib/Control.Geocoder.js"></script>
  	<script src="lib/jquery-ui.min.js"></script>
 
 	<script type="text/javascript">
@@ -69,6 +71,31 @@
 		map = L.map('map').setView(viewCenter, viewZoom );
 		map.on('moveend', onMapMoveEnd);
 
+		// Leaflet-hash lets you to add dynamic URL hashes to web pages with Leaflet maps.
+		// You can easily link users to specific map views.
+		var hash = new L.Hash(map);
+
+		// Control geocoder
+
+		// A simple geocoder for Leaflet that by default uses OSM/Nominatim.
+		var geocoder = L.Control.geocoder({
+			collapsed: false,
+			placeholder: 'Rechercher une adresse...',
+			position: 'topleft'
+		})
+		.addTo(map);
+
+		// Repositionne les controles du zoom pour qu'ils soit après le controle GeoCoder
+		map.zoomControl.setPosition('topleft');
+		map.zoomDisplayControl.setPosition('topleft');
+
+		// Control échelle
+
+		L.control.scale({
+			position: 'bottomleft'
+		})
+		.addTo(map);
+
 		var OsmDataAttr = 'Data © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>';
 		var osmFr = new L.TileLayer(
 			'http://{s}.tile.openstreetmap.fr/{type}/{z}/{x}/{y}.png', {
@@ -79,12 +106,6 @@
 		});
 		//osmFr.addTo(map);
 		map.addLayer(osmFr);
-
-		// Leaflet-hash lets you to add dynamic URL hashes to web pages with Leaflet maps.
-		// You can easily link users to specific map views.
-		var hash = new L.Hash(map);
- 
-		L.control.scale().addTo(map);
 
 		markers = new L.featureGroup();
 		markers.addTo(map).on("click",function(e){
@@ -125,19 +146,6 @@
 		return arr.reduce(function (x,y) {
 			return [x[0] + y[0]/arr.length, x[1] + y[1]/arr.length] 
 		}, [0,0]) 
-	}
-
-	window.onhashchange = function ()
-	{
-		console.log(window.location.hash.toString() );
-		//var r = new RegExp("/\#map=([\d]+)\/([\d\.]+)\/([\d\.]+)/");
-		var r = new RegExp("/map=([0-9]+)/");
-		var m = r.exec( window.location.hash );
-		console.log(m);
-		//		if( r && r.length==2 ){
-		//			$('#'+siren+'raisonSociale', item).val( r[1] );
-		//	}
-
 	}
 
 	function onMapMoveEnd()
