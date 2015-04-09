@@ -54,7 +54,7 @@
 	var dataMinZoom = 19 ;
 
 	var map = null ;
-	var markers = null ;
+	var addrMarkers = null ;
 
 	var $dialog = $('<div></div>')
 	   .html('<iframe id="formulaire" style="border: 0px; " src="' + 'formulaire.html' + '" width="100%" height="100%"></iframe>')
@@ -107,8 +107,8 @@
 		//osmFr.addTo(map);
 		map.addLayer(osmFr);
 
-		markers = new L.featureGroup();
-		markers.addTo(map).on("click",function(e){
+		addrMarkers = new L.featureGroup();
+		addrMarkers.addTo(map).on("click",function(e){
 			console.log("click");
 
 			$dialog.dialog('open');
@@ -156,7 +156,7 @@
 
 		var bounds = map.getBounds();
 
-		//loadOApiAdress( bounds );
+		loadOApiAdress( bounds );
 
 	}// onMapMoveEnd
 
@@ -233,7 +233,7 @@
 							houseNumber: an,
 							streetName: streetName
 						})
-						.addTo(markers)
+						.addTo(addrMarkers)
 						/*.on("click",function(){
 							//console.log("click");
 						})*/;
@@ -264,7 +264,7 @@
 							houseNumber: an,
 							streetName: streetName
 						})
-						.addTo(markers)
+						.addTo(addrMarkers)
 						/*.on("click",function(){
 							//console.log("click");
 						})*/;
