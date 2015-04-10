@@ -47,8 +47,8 @@
 	"use strict";
 
 	var oapi_url = 'http://www.overpass-api.de/api/interpreter?';
-		var quaiPaulBert =  [47.40230, 0.69342];
-		var rueLittre =  [47.3956631,0.6820366];
+	var quaiPaulBert =  [47.40230, 0.69342];
+	var rueLittre =  [47.3956631,0.6820366];
 	var viewCenter = rueLittre ;
 	var viewZoom = 20 ;
 	var dataMinZoom = 19 ;
@@ -68,12 +68,11 @@
 
 	$(function()
 	{
-		map = L.map('map').setView(viewCenter, viewZoom );
-		map.on('moveend', onMapMoveEnd);
-
-		// Leaflet-hash lets you to add dynamic URL hashes to web pages with Leaflet maps.
-		// You can easily link users to specific map views.
-		var hash = new L.Hash(map);
+		//map = L.map('map').setView(viewCenter, viewZoom );
+		map = L.map('map', {
+			center: viewCenter,
+			zoom: viewZoom
+		});
 
 		// Control geocoder
 
@@ -121,11 +120,18 @@
 
 		});
 
+		map.on('moveend', onMapMoveEnd);
+
 		$(window).on('resize', function() {
 			$('#map').height($(window).height());
 			//.width($(window).width());
 			map.invalidateSize();
 		}).trigger('resize');
+
+		// Leaflet-hash lets you to add dynamic URL hashes to web pages with Leaflet maps.
+		// You can easily link users to specific map views.
+		// Warning: keep this instruction at the end of initialization - Cyrille
+		var hash = new L.Hash(map);
 
 	});
 
@@ -156,7 +162,7 @@
 
 		var bounds = map.getBounds();
 
-		loadOApiAdress( bounds );
+//		loadOApiAdress( bounds );
 
 	}// onMapMoveEnd
 
